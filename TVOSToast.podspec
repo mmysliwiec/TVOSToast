@@ -105,7 +105,9 @@ Toast component for tvOS with built-in siri remote hint support.
   #
 
   # s.resource  = "icon.png"
-  s.resource_bundle = "TVOSToastResourceBundle" => ["TVOSToast/Resources/*.png"]
+  s.resource_bundles = {
+    'TVOSToastResourceBundle' => ['TVOSToast/Resources/*.png']
+  }
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
 
