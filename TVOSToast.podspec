@@ -105,9 +105,9 @@ Pod::Spec.new do |s|
 
   # s.resource  = "icon.png"
   
-  s.resource_bundles = {
-    'TVOSToastResourceBundle' => ['TVOSToast/Resources/*.png']
-  }
+  #s.resource_bundles = {
+  #  'TVOSToastResourceBundle' => ['TVOSToast/Resources/*.png']
+  #}
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
 
