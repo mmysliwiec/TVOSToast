@@ -205,7 +205,7 @@ public class TVOSToast: UIView {
     
     // MARK: Present
     
-    public func presentOnView(view: UIView) {
+    public func presentOnView(view: UIView, callback: (() -> ())? = nil) {
         
         // get style
         let position = style.position ?? .Bottom(insets: 20)
@@ -279,11 +279,12 @@ public class TVOSToast: UIView {
                                         },
                                         completion: { finished in
                                             self.removeFromSuperview()
+                                            callback?()
                                     })
         })
     }
     
-    public func presentOnWindow(relatedToView view: UIView?) {
+    public func presentOnWindow(relatedToView view: UIView?, callback: (() -> ())? = nil) {
         guard let _window = UIApplication.sharedApplication().delegate?.window, window = _window else {
             return
         }
@@ -365,6 +366,7 @@ public class TVOSToast: UIView {
                     },
                     completion: { finished in
                         self.removeFromSuperview()
+                        callback?()
                 })
         })
         

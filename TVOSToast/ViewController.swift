@@ -12,7 +12,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let tap = UITapGestureRecognizer(target: self, action: "showToast:")
+        let tap = UITapGestureRecognizer(target: self, action: #selector(showToast(_:)))
         tap.allowedPressTypes = [UIPressType.Select.rawValue]
         view.addGestureRecognizer(tap)
     }
@@ -59,7 +59,7 @@ class ViewController: UIViewController {
         let toast = TVOSToast(frame: CGRect(x: 0, y: 0, width: 500, height: 140))
         toast.style.position = TVOSToastPosition.BottomRight(insets: 20)
         toast.text = "This is toast on window"
-        toast.presentOnWindow(relatedToView: nil)
+        toast.presentOnWindow(relatedToView: nil, callback: { print("presentOnWindow callback") })
     }
     
 }
