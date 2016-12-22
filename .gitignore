@@ -33,7 +33,7 @@ xcuserdata
 Carthage/Build
 
 ## Cocoapods
-#Pods/
+Pods/
 
 ## Custom
 *.mov
