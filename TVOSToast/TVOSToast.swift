@@ -13,7 +13,7 @@ import ManualLayout
 
 public extension UIViewController {
 
-    public func presentToast(toast: TVOSToast) {
+    public func presentToast(_ toast: TVOSToast) {
         toast.presentOnView(self.view)
     }
 }
@@ -23,7 +23,7 @@ public extension UIViewController {
 public extension NSAttributedString {
 
     public convenience init(text: String, fontName: String, fontSize: CGFloat, color: UIColor) {
-        let font = UIFont(name: fontName, size: fontSize) ?? UIFont.systemFontOfSize(fontSize)
+        let font = UIFont(name: fontName, size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
         self.init(text: text, font: font, color: color)
     }
 
@@ -35,9 +35,9 @@ public extension NSAttributedString {
         self.init(string: text, attributes: attributes)
     }
 
-    public convenience init(imageName: String, bounds: CGRect?, bundle: NSBundle) {
+    public convenience init(imageName: String, bounds: CGRect?, bundle: Bundle) {
         let textAttachment = NSTextAttachment()
-        textAttachment.image = UIImage(named: imageName, inBundle: bundle, compatibleWithTraitCollection: nil)
+        textAttachment.image = UIImage(named: imageName, in: bundle, compatibleWith: nil)
         if let bounds = bounds {
             textAttachment.bounds = bounds
         }
@@ -47,7 +47,7 @@ public extension NSAttributedString {
     public convenience init(attributedStrings: NSAttributedString...) {
         let mutableAttributedString = NSMutableAttributedString()
         for attributedString in attributedStrings {
-            mutableAttributedString.appendAttributedString(attributedString)
+            mutableAttributedString.append(attributedString)
         }
         self.init(attributedString: mutableAttributedString)
     }
@@ -67,12 +67,13 @@ public enum TVOSToastRemoteButtonType: String {
     case VolumeWhite
     case VolumeBlack
 
-    private func getImageName() -> String {
+    fileprivate func getImageName() -> String {
         return "tvosToast\(rawValue).png"
     }
 
-    public func getAttributedString(bounds bounds: CGRect? = nil) -> NSAttributedString {
-        if let bundlePath = NSBundle(forClass: TVOSToast.self).pathForResource("TVOSToastResourceBundle", ofType: "bundle"), bundle = NSBundle(path: bundlePath) {
+    public func getAttributedString(bounds: CGRect? = nil) -> NSAttributedString {
+        let bundlePath = Bundle(for: TVOSToast.self).bundlePath
+        if let bundle = Bundle(path: bundlePath) {
             return  NSAttributedString(imageName: self.getImageName(), bounds: bounds, bundle: bundle)
         }
 
@@ -81,50 +82,50 @@ public enum TVOSToastRemoteButtonType: String {
 }
 
 public enum ToastElement {
-    case StringType(String)
-    case RemoteButtonType(TVOSToastRemoteButtonType)
+    case stringType(String)
+    case remoteButtonType(TVOSToastRemoteButtonType)
 }
 
 
 public func +(lhs: String, rhs: TVOSToastRemoteButtonType) -> [ToastElement] {
-    return [.StringType(lhs), .RemoteButtonType(rhs)]
+    return [.stringType(lhs), .remoteButtonType(rhs)]
 }
 
 public func +(lhs: TVOSToastRemoteButtonType, rhs: String) -> [ToastElement] {
-    return [.RemoteButtonType(lhs), .StringType(rhs)]
+    return [.remoteButtonType(lhs), .stringType(rhs)]
 }
 
 public func +(lhs: [ToastElement], rhs: String) -> [ToastElement] {
-    return lhs + [.StringType(rhs)]
+    return lhs + [.stringType(rhs)]
 }
 
 public func +(lhs: String, rhs: [ToastElement]) -> [ToastElement] {
-    return [.StringType(lhs)] + rhs
+    return [.stringType(lhs)] + rhs
 }
 
 
 // MARK: - TVOSToastHintText
 
-public class TVOSToastHintText {
+open class TVOSToastHintText {
 
-    public var elements: [ToastElement]
+    open var elements: [ToastElement]
 
     public init(element: [ToastElement]) {
         self.elements = element
     }
 
-    public func buildAttributedString(font: UIFont, textColor: UIColor) -> NSAttributedString {
+    open func buildAttributedString(_ font: UIFont, textColor: UIColor) -> NSAttributedString {
         let mutableAttributedString = NSMutableAttributedString()
 
         for element in elements {
 
             switch element {
-            case .StringType(let asString):
-                mutableAttributedString.appendAttributedString(NSAttributedString(text: asString, font: font, color: textColor))
+            case .stringType(let asString):
+                mutableAttributedString.append(NSAttributedString(text: asString, font: font, color: textColor))
 
-            case .RemoteButtonType(let asRemoteButtonType):
+            case .remoteButtonType(let asRemoteButtonType):
                 let size = font.pointSize + 30
-                mutableAttributedString.appendAttributedString(asRemoteButtonType.getAttributedString(bounds: CGRect(x: 0, y: -size/4, width: size, height: size)))
+                mutableAttributedString.append(asRemoteButtonType.getAttributedString(bounds: CGRect(x: 0, y: -size/4, width: size, height: size)))
             }
         }
         return mutableAttributedString.mutableCopy() as! NSAttributedString
@@ -134,12 +135,12 @@ public class TVOSToastHintText {
 // MARK: - Position
 
 public enum TVOSToastPosition {
-    case Top(insets: CGFloat)
-    case TopLeft(insets: CGFloat)
-    case TopRight(insets: CGFloat)
-    case Bottom(insets: CGFloat)
-    case BottomLeft(insets: CGFloat)
-    case BottomRight(insets: CGFloat)
+    case top(insets: CGFloat)
+    case topLeft(insets: CGFloat)
+    case topRight(insets: CGFloat)
+    case bottom(insets: CGFloat)
+    case bottomLeft(insets: CGFloat)
+    case bottomRight(insets: CGFloat)
 }
 
 // MARK: - Style
@@ -147,7 +148,7 @@ public enum TVOSToastPosition {
 public struct TVOSToastStyle {
     // presentation
     public var position: TVOSToastPosition?
-    public var duration: NSTimeInterval?
+    public var duration: TimeInterval?
     // appearance
     public var backgroundColor: UIColor?
     public var cornerRadius: CGFloat?
@@ -167,19 +168,19 @@ public struct TVOSToastStyle {
 
 // MARK: - Toast
 
-public class TVOSToast: UIView {
+open class TVOSToast: UIView {
 
     // MARK: Properties
 
-    public var style: TVOSToastStyle
+    open var style: TVOSToastStyle
 
-    public var customContent: UIView?
-    public var text: String?
-    public var attributedText: NSAttributedString?
-    public var hintText: TVOSToastHintText?
+    open var customContent: UIView?
+    open var text: String?
+    open var attributedText: NSAttributedString?
+    open var hintText: TVOSToastHintText?
 
-    private let customContentView = UIView()
-    private let textLabel = UILabel()
+    fileprivate let customContentView = UIView()
+    fileprivate let textLabel = UILabel()
 
     // MARK: Init
 
@@ -197,27 +198,27 @@ public class TVOSToast: UIView {
         setup()
     }
 
-    private func setup() {
+    fileprivate func setup() {
         customContentView.frame = bounds
         textLabel.frame = bounds
         addSubview(customContentView)
         // text
         textLabel.numberOfLines = 0
-        textLabel.textAlignment = .Center
+        textLabel.textAlignment = .center
         addSubview(textLabel)
     }
 
     // MARK: Present
 
-    public func presentOnView(view: UIView, callback: (() -> Void)? = nil) {
+    open func presentOnView(_ view: UIView, callback: (() -> Void)? = nil) {
 
         // get style
-        let position = style.position ?? .Bottom(insets: 20)
+        let position = style.position ?? .bottom(insets: 20)
         let duration = style.duration ?? 3
-        let backgroundColor = style.backgroundColor ?? UIColor.grayColor()
+        let backgroundColor = style.backgroundColor ?? UIColor.gray
         let cornerRadius = style.cornerRadius ?? 10
-        let font = style.font ?? UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
-        let textColor = style.textColor ?? UIColor.whiteColor()
+        let font = style.font ?? UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)
+        let textColor = style.textColor ?? UIColor.white
 
         // setup style
         self.backgroundColor = backgroundColor
@@ -243,41 +244,41 @@ public class TVOSToast: UIView {
 
         // setup position
         switch position {
-        case .Top(let insets):
+        case .top(let insets):
             top = insets
             centerX = view.width / 2
-        case .TopLeft(let insets):
+        case .topLeft(let insets):
             top = insets
             left = insets
-        case .TopRight(let insets):
+        case .topRight(let insets):
             top = insets
             right = view.right - insets
-        case .Bottom(let insets):
+        case .bottom(let insets):
             bottom = view.bottom - insets
             centerX = view.width / 2
-        case .BottomLeft(let insets):
+        case .bottomLeft(let insets):
             bottom = view.bottom - insets
             left = insets
-        case .BottomRight(let insets):
+        case .bottomRight(let insets):
             bottom = view.bottom - insets
             right = view.right - insets
         }
 
         // animate toast
-        UIView.animateWithDuration(0.3,
+        UIView.animate(withDuration: 0.3,
                                    delay: 0,
                                    usingSpringWithDamping: 1,
                                    initialSpringVelocity: 0,
-                                   options: .AllowAnimatedContent,
+                                   options: .allowAnimatedContent,
                                    animations: {
                                     self.alpha = 1
             },
                                    completion: { finished in
-                                    UIView.animateWithDuration(0.3,
+                                    UIView.animate(withDuration: 0.3,
                                         delay: duration,
                                         usingSpringWithDamping: 1,
                                         initialSpringVelocity: 0,
-                                        options: .AllowAnimatedContent,
+                                        options: .allowAnimatedContent,
                                         animations: {
                                             self.alpha = 0
                                         },
@@ -288,18 +289,18 @@ public class TVOSToast: UIView {
         })
     }
 
-    public func presentOnWindow(relatedToView view: UIView?, callback: (() -> Void)? = nil) {
-        guard let _window = UIApplication.sharedApplication().delegate?.window, window = _window else {
+    open func presentOnWindow(relatedToView view: UIView?, callback: (() -> Void)? = nil) {
+        guard let _window = UIApplication.shared.delegate?.window, let window = _window else {
             return
         }
 
         // get style
-        let position = style.position ?? .Bottom(insets: 20)
+        let position = style.position ?? .bottom(insets: 20)
         let duration = style.duration ?? 3
-        let backgroundColor = style.backgroundColor ?? UIColor.grayColor()
+        let backgroundColor = style.backgroundColor ?? UIColor.gray
         let cornerRadius = style.cornerRadius ?? 10
-        let font = style.font ?? UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
-        let textColor = style.textColor ?? UIColor.whiteColor()
+        let font = style.font ?? UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)
+        let textColor = style.textColor ?? UIColor.white
 
         // setup style
         self.backgroundColor = backgroundColor
@@ -311,7 +312,7 @@ public class TVOSToast: UIView {
         let viewHeight: CGFloat
 
         if let view = view {
-            superViewOriginToWindow = view.convertPoint(view.bounds.origin, toView: window)
+            superViewOriginToWindow = view.convert(view.bounds.origin, to: window)
             viewWidth = view.width
             viewHeight = view.height
         } else {
@@ -335,36 +336,36 @@ public class TVOSToast: UIView {
 
         // setup position
         switch position {
-        case .Top(let insets):
+        case .top(let insets):
             center = CGPoint(x: superViewOriginToWindow.x + viewWidth/2, y: superViewOriginToWindow.y + insets + height/2)
-        case .TopLeft(let insets):
+        case .topLeft(let insets):
             center = CGPoint(x: superViewOriginToWindow.x + insets + width/2, y: superViewOriginToWindow.y + insets + height/2)
-        case .TopRight(let insets):
+        case .topRight(let insets):
             center = CGPoint(x: superViewOriginToWindow.x + viewWidth - insets - width/2, y: superViewOriginToWindow.y + insets + height/2)
-        case .Bottom(let insets):
+        case .bottom(let insets):
             center = CGPoint(x: superViewOriginToWindow.x + viewWidth/2, y: superViewOriginToWindow.y + viewHeight - insets - height/2)
-        case .BottomLeft(let insets):
+        case .bottomLeft(let insets):
             center = CGPoint(x: superViewOriginToWindow.x + insets + width/2, y: superViewOriginToWindow.y + viewHeight - insets - height/2)
-        case .BottomRight(let insets):
+        case .bottomRight(let insets):
             center = CGPoint(x: superViewOriginToWindow.x + viewWidth - insets - width/2, y: superViewOriginToWindow.y + viewHeight - insets - height/2)
         }
 
         // animate toast
-        UIView.animateWithDuration(
-            0.3,
+        UIView.animate(
+            withDuration: 0.3,
             delay: 0,
             usingSpringWithDamping: 1,
             initialSpringVelocity: 0,
-            options: .AllowAnimatedContent,
+            options: .allowAnimatedContent,
             animations: {
                 self.alpha = 1
             },
             completion: { finished in
-                UIView.animateWithDuration(0.3,
+                UIView.animate(withDuration: 0.3,
                     delay: duration,
                     usingSpringWithDamping: 1,
                     initialSpringVelocity: 0,
-                    options: .AllowAnimatedContent,
+                    options: .allowAnimatedContent,
                     animations: {
                         self.alpha = 0
                     },
@@ -376,14 +377,14 @@ public class TVOSToast: UIView {
 
     }
 
-    public func hide(callback: (() -> Void)? = nil) {
+    open func hide(_ callback: (() -> Void)? = nil) {
         layer.removeAllAnimations()
 
-        UIView.animateWithDuration(0.3,
+        UIView.animate(withDuration: 0.3,
                                    delay: 0,
                                    usingSpringWithDamping: 1,
                                    initialSpringVelocity: 0,
-                                   options: .AllowAnimatedContent,
+                                   options: .allowAnimatedContent,
                                    animations: {
                                     self.alpha = 0
             },

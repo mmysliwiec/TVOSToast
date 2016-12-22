@@ -13,11 +13,11 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let tap = UITapGestureRecognizer(target: self, action: #selector(showToast(_:)))
-        tap.allowedPressTypes = [UIPressType.Select.rawValue]
+        tap.allowedPressTypes = [NSNumber(integerLiteral: UIPressType.select.rawValue)]
         view.addGestureRecognizer(tap)
     }
     
-    func showToast(tap: UITapGestureRecognizer) {
+    func showToast(_ tap: UITapGestureRecognizer) {
         showToastWithAttributedString()
         showToastWithHintText()
         showToastWithText()
@@ -28,36 +28,36 @@ class ViewController: UIViewController {
     
     func showToastWithHintText() {
         let toast = TVOSToast(frame: CGRect(x: 0, y: 0, width: 800, height: 140))
-        toast.style.position = TVOSToastPosition.Bottom(insets: 20)
+        toast.style.position = TVOSToastPosition.bottom(insets: 20)
         toast.hintText = TVOSToastHintText(element: "Press the" + TVOSToastRemoteButtonType.MenuWhite + " button to exit app")
         presentToast(toast)
     }
     
     func showToastWithAttributedString() {
         let toast = TVOSToast(frame: CGRect(x: 0, y: 0, width: 800, height: 140))
-        toast.style.position = TVOSToastPosition.TopLeft(insets: 20)
+        toast.style.position = TVOSToastPosition.topLeft(insets: 20)
         toast.attributedText = NSAttributedString(attributedStrings:
             NSAttributedString(
                 text: "This is ",
-                font: UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline),
-                color: UIColor.whiteColor()),
+                font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline),
+                color: UIColor.white),
                                                   NSAttributedString(
                                                     text: "attributed string",
-                                                    font: UIFont.italicSystemFontOfSize(25),
-                                                    color: UIColor.whiteColor()))
+                                                    font: UIFont.italicSystemFont(ofSize: 25),
+                                                    color: UIColor.white))
         presentToast(toast)
     }
     
     func showToastWithText() {
         let toast = TVOSToast(frame: CGRect(x: 0, y: 0, width: 800, height: 140))
-        toast.style.position = TVOSToastPosition.TopRight(insets: 20)
+        toast.style.position = TVOSToastPosition.topRight(insets: 20)
         toast.text = "This is regular text"
         presentToast(toast)
     }
     
     func showToastOnWindow() {
         let toast = TVOSToast(frame: CGRect(x: 0, y: 0, width: 500, height: 140))
-        toast.style.position = TVOSToastPosition.BottomRight(insets: 20)
+        toast.style.position = TVOSToastPosition.bottomRight(insets: 20)
         toast.text = "This is toast on window"
         toast.presentOnWindow(relatedToView: nil, callback: { print("presentOnWindow callback") })
     }
