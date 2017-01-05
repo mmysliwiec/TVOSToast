@@ -73,11 +73,8 @@ public enum TVOSToastRemoteButtonType: String {
 
     public func getAttributedString(bounds: CGRect? = nil) -> NSAttributedString {
         let bundlePath = Bundle(for: TVOSToast.self).bundlePath
-        if let bundle = Bundle(path: bundlePath) {
-            return  NSAttributedString(imageName: self.getImageName(), bounds: bounds, bundle: bundle)
-        }
-
-        fatalError("Can't load TVOSToastResourceBundle")
+        let bundle = Bundle(path: bundlePath + "/TVOSToastResourceBundle.bundle") ?? Bundle(for: TVOSToast.self)
+        return  NSAttributedString(imageName: self.getImageName(), bounds: bounds, bundle: bundle)
     }
 }
 
