@@ -13,11 +13,11 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let tap = UITapGestureRecognizer(target: self, action: #selector(showToast(_:)))
-        tap.allowedPressTypes = [NSNumber(integerLiteral: UIPressType.select.rawValue)]
+        tap.allowedPressTypes = [NSNumber(integerLiteral: UIPress.PressType.select.rawValue)]
         view.addGestureRecognizer(tap)
     }
     
-    func showToast(_ tap: UITapGestureRecognizer) {
+    @objc func showToast(_ tap: UITapGestureRecognizer) {
         showToastWithAttributedString()
         showToastWithHintText()
         showToastWithText()
@@ -39,7 +39,7 @@ class ViewController: UIViewController {
         toast.attributedText = NSAttributedString(attributedStrings:
             NSAttributedString(
                 text: "This is ",
-                font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline),
+                font: UIFont.preferredFont(forTextStyle: UIFont.TextStyle.headline),
                 color: UIColor.white),
                                                   NSAttributedString(
                                                     text: "attributed string",

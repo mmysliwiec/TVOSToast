@@ -4,9 +4,13 @@ PODS:
 DEPENDENCIES:
   - ManualLayout
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - ManualLayout
+
 SPEC CHECKSUMS:
   ManualLayout: 68ac8cfa6b5f656f7a9fadec3730208b95986880
 
 PODFILE CHECKSUM: 5e38e17763cb2cb5ed38b45b12864dbb982c517e
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.7.0
